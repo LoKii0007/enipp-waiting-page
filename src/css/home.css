@@ -1,8 +1,8 @@
-.tf-button{
+.tf-button {
     position: relative;
-  }
-  
-  .tf-button::after {
+}
+
+.tf-button::after {
     content: "";
     position: absolute;
     width: 0%;
@@ -10,13 +10,22 @@
     background-color: #21E378;
     transition: all 0.3s;
     z-index: 10;
-  }
-  
-  .tf-btn-2::after{
+}
+
+.tf-btn-2::after {
     background-color: blue;
-  }
-  
-  .tf-button:hover::after {
+}
+
+.tf-button:hover::after {
     width: 100%;
     height: 100%;
-  }
+}
+
+@font-face {
+    font-family: 'enipp';
+    src: url('/Enipp-Font.otf');
+}
+
+body{
+    font-family: 'enipp';
+}
