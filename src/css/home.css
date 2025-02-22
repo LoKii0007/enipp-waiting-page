@@ -26,6 +26,26 @@
     src: url('/Enipp-Font.otf');
 }
 
-body{
+body {
     font-family: 'enipp';
 }
+
+/* .waiting-page {
+    background: rgb(2,0,36);
+    background: radial-gradient(circle, rgba(2,0,36,1) 30%, rgba(14,199,71,1) 50%, rgba(0,0,0,0.991275733926383) 65%);
+} */
+
+.page-bg-out, .page-bg-in-2{
+    box-shadow: #21E378 0px 0px 50px 20px ;
+    border: 5px solid #21E378;
+}
+.page-bg-in, .page-bg-out-2{
+    box-shadow: inset #21E378 0px 0px 25px 10px ;
+}
+
+/* .page-bg-in-2{
+    box-shadow: #21E378 0px 0px 25px 25px  ;
+}
+.page-bg-out-2{
+    box-shadow: inset #21E378 0px 0px 25px 25px  ;
+} */

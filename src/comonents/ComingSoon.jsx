@@ -137,7 +137,11 @@ const ComingSoonPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-[#787878] flex flex-col items-center gap-10 justify-center p-5 text-white md:p-12 ">
+    <div className="min-h-screen waiting-page w-screen bg-[#000000] flex flex-col items-center gap-10 justify-center relative p-5 text-white md:p-12 ">
+      <div className="absolute page-bg-out h-[100vh] w-[100vh] rounded-full bg-transparent "></div>
+      <div className="absolute page-bg-out-2 h-[100vh] w-[100vh] rounded-full bg-transparent "></div>
+      <div className="absolute page-bg-in h-[calc(100vh-5px)] w-[calc(100vh-5px)] rounded-full bg-transparent "></div>
+      <div className="absolute page-bg-in-1 h-[calc(100vh-5px)] w-[calc(100vh-5px)] rounded-full bg-transparent "></div>
       {/* Logo */}
       <div className="flex items-center justify-center gap-2">
         <img className="w-5" src="/enipp-logo.png" alt="" />
@@ -177,7 +181,7 @@ const ComingSoonPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="flex-1 p-3 bg-[#838383] text-[#C2C3C5] border-none focus:ring-0 focus:outline-none"
+            className="flex-1 p-3 bg-[#838383] z-20 text-[#C2C3C5] border-none focus:ring-0 focus:outline-none"
           />
           <button
             disabled={!email || loading}
