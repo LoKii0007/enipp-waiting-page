@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, limit, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const icons = [
   {
     name: "twitter",
+    link: "https://www.instagram.com/enippofficial/",
     image: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -21,22 +23,8 @@ const icons = [
     ),
   },
   {
-    name: "facebook",
-    image: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        fill="currentColor"
-        class="bi bi-facebook"
-        viewBox="0 0 16 16"
-      >
-        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951" />
-      </svg>
-    ),
-  },
-  {
     name: "instagram",
+    link: "https://www.instagram.com/enippofficial/",
     image: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -50,36 +38,40 @@ const icons = [
       </svg>
     ),
   },
-  {
-    name: "linkedin",
-    image: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        fill="currentColor"
-        class="bi bi-linkedin"
-        viewBox="0 0 16 16"
-      >
-        <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z" />
-      </svg>
-    ),
-  },
 ];
 
 const ComingSoonPage = () => {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 19,
-    hours: 3,
-    minutes: 35,
-    seconds: 31,
-  });
-
+  const [timeLeft, setTimeLeft] = useState({});
+  const [timeToLive, setTimeToLive] = useState(1742034600);
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const targetSeconds = timeToLive || 0;
+    const currentSeconds = Math.floor(Date.now() / 1000); // Convert current time to seconds
+
+    // Calculate remaining seconds
+    let remainingSeconds = targetSeconds - currentSeconds;
+
+    if (remainingSeconds < 0) {
+      console.log("Timer has expired.");
+      remainingSeconds = 0; // Ensure no negative values
+    }
+
+    // Convert remaining seconds into days, hours, minutes, and seconds
+    const days = Math.floor(remainingSeconds / (24 * 3600));
+    const hours = Math.floor((remainingSeconds % (24 * 3600)) / 3600);
+    const minutes = Math.floor((remainingSeconds % 3600) / 60);
+    const seconds = remainingSeconds % 60;
+
+    setTimeLeft({
+      days,
+      hours,
+      minutes,
+      seconds,
+    });
+
+    fetchTime();
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (
@@ -136,12 +128,52 @@ const ComingSoonPage = () => {
     }
   };
 
+  async function fetchTime() {
+    try {
+      const timerQuery = await getDocs(collection(db, "timer"));
+  
+      if (!timerQuery.empty) {
+        const timerData = timerQuery.docs[0].data();
+  
+        // Extract `seconds` from Firestore timestamp
+        const targetSeconds = timerData.timeToLive?.seconds || 0;
+        const currentSeconds = Math.floor(Date.now() / 1000); // Convert current time to seconds
+  
+        // Calculate remaining seconds
+        let remainingSeconds = targetSeconds - currentSeconds;
+  
+        if (remainingSeconds < 0) {
+          console.log("Timer has expired.");
+          remainingSeconds = 0; // Ensure no negative values
+        }
+  
+        // Convert remaining seconds into days, hours, minutes, and seconds
+        const days = Math.floor(remainingSeconds / (24 * 3600));
+        const hours = Math.floor((remainingSeconds % (24 * 3600)) / 3600);
+        const minutes = Math.floor((remainingSeconds % 3600) / 60);
+        const seconds = remainingSeconds % 60;
+  
+        setTimeLeft({
+          days,
+          hours,
+          minutes,
+          seconds,
+        });
+  
+      } else {
+        console.log("No timer data found.");
+      }
+    } catch (error) {
+      console.error("Error fetching timer data:", error);
+    }
+  }
+  
+  
+
   return (
-    <div className="min-h-screen waiting-page w-screen bg-[#000000] flex flex-col items-center gap-10 justify-center relative p-5 text-white md:p-12 ">
-      <div className="absolute page-bg-out h-[100vh] w-[100vh] rounded-full bg-transparent "></div>
-      <div className="absolute page-bg-out-2 h-[100vh] w-[100vh] rounded-full bg-transparent "></div>
-      <div className="absolute page-bg-in h-[calc(100vh-5px)] w-[calc(100vh-5px)] rounded-full bg-transparent "></div>
-      <div className="absolute page-bg-in-1 h-[calc(100vh-5px)] w-[calc(100vh-5px)] rounded-full bg-transparent "></div>
+    <div className="min-h-screen waiting-page w-screen bg-[#000000] flex flex-col items-center gap-10 justify-center relative p-5 text-white md:p-12 overflow-hidden ">
+      <div className="absolute page-bg-out h-[90vh] w-[90vh] md:h-[100vh] md:w-[100vh] rounded-full bg-transparent "></div>
+      <div className="absolute page-bg-in h-[calc(90vh-5px)] w-[calc(90vh-5px)] md:h-[calc(100vh-5px)] md:w-[calc(100vh-5px)] rounded-full bg-transparent "></div>
       {/* Logo */}
       <div className="flex items-center justify-center gap-2">
         <img className="w-5" src="/enipp-logo.png" alt="" />
@@ -156,15 +188,15 @@ const ComingSoonPage = () => {
 
         {/* Countdown Timer */}
         <div className="grid grid-cols-4 gap-10 text-center">
-          {Object.entries(timeLeft).map(([label, value]) => (
+          {Object.entries(timeLeft)?.map(([label, value]) => (
             <div
               key={label}
               className="flex flex-col gap-2 justify-center items-center"
             >
-              <span className="text-4xl md:text-[56px] bg-[#838383] w-[80px] h-[80px] md:w-[108px] md:h-[108px] flex justify-center items-center font-sans font-bold">
+              <span className="text-3xl md:text-[56px] bg-[#838383] w-[70px] h-[70px] md:w-[108px] md:h-[108px] flex justify-center items-center font-sans font-bold">
                 {String(value).padStart(2, "0")}
               </span>
-              <p className="text-[20px] font-bold text-[#C2C3C5] uppercase mt-2">
+              <p className="text-sm md:text-[20px] font-bold text-[#C2C3C5] uppercase mt-2">
                 {label}
               </p>
             </div>
@@ -181,7 +213,7 @@ const ComingSoonPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="flex-1 p-3 bg-[#838383] z-20 text-[#C2C3C5] border-none focus:ring-0 focus:outline-none"
+            className=" w-2/3 md:flex-1 p-3 bg-[#838383] z-20 text-[#C2C3C5] border-none focus:ring-0 focus:outline-none"
           />
           <button
             disabled={!email || loading}
@@ -194,9 +226,6 @@ const ComingSoonPage = () => {
           </button>
         </form>
       </div>
-
-      {/* Signup Message */}
-      {message && <p className="text-white">{message}</p>}
 
       {/* Buttons */}
       <div className="flex gap-6">
@@ -211,12 +240,14 @@ const ComingSoonPage = () => {
       {/* Social Icons */}
       <div className="flex gap-6 justify-center items-center">
         {icons.map((icon) => (
-          <div
-            key={icon}
-            className=" p-3 bg-[#838383] flex items-center justify-center"
-          >
-            {icon.image}
-          </div>
+          <Link to={icon.link} target="_blank" className="z-20">
+            <div
+              key={icon}
+              className=" p-3 bg-[#838383] flex items-center justify-center cursor-pointer "
+            >
+              {icon.image}
+            </div>
+          </Link>
         ))}
       </div>
     </div>
