@@ -213,7 +213,7 @@ const ComingSoonPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className=" w-2/3 md:flex-1 p-3 bg-[#838383] z-20 text-[#C2C3C5] border-none focus:ring-0 focus:outline-none"
+            className=" w-2/3 md:flex-1 p-3 bg-[#838383] z-20 font-sans text-[#C2C3C5] border-none focus:ring-0 focus:outline-none"
           />
           <button
             disabled={!email || loading}
